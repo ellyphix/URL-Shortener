@@ -1,6 +1,16 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import app from "../artifacts/api-server/src/app";
 
+// An Express app is a callable request listener at runtime, but the `Express`
+// interface only exposes that call signature through the `Application`
+// overloads it inherits from @types/express-serve-static-core. Type the
+// listener explicitly so this entry point does not depend on which of those
+// declarations a given build resolves.
+const handleRequest = app as unknown as (
+  req: IncomingMessage,
+  res: ServerResponse,
+) => void;
+
 // Vercel may expose the rewritten destination rather than the public URL to
 // the function. Restore the API path in that case before Express handles it.
 export default function handler(req: IncomingMessage, res: ServerResponse): void {
@@ -18,5 +28,5 @@ export default function handler(req: IncomingMessage, res: ServerResponse): void
     url.searchParams.delete("__vercel_api_path");
     req.url = `${url.pathname}${url.search}`;
   }
-  app(req, res);
+  handleRequest(req, res);
 }
