@@ -1,0 +1,105 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: urls
+    description: URL shortening
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /urls:
+    post:
+      operationId: createUrl
+      tags: [urls]
+      summary: Create a short URL
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UrlInput"
+      responses:
+        "201":
+          description: Short URL created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ShortUrl"
+        "400":
+          description: Invalid URL
+        "429":
+          description: Rate limit exceeded
+        "500":
+          description: Database error
+  /urls/{shortCode}:
+    get:
+      operationId: getUrl
+      tags: [urls]
+      summary: Resolve a short code
+      parameters:
+        - in: path
+          name: shortCode
+          required: true
+          schema:
+            type: string
+            pattern: "^[A-Za-z0-9]{6,12}$"
+      responses:
+        "200":
+          description: Original URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResolvedUrl"
+        "404":
+          description: Unknown short code
+        "500":
+          description: Database error
+components:
+  schemas:
+    UrlInput:
+      type: object
+      required: [originalUrl]
+      properties:
+        originalUrl:
+          type: string
+          minLength: 1
+          maxLength: 2048
+    ShortUrl:
+      type: object
+      required: [shortUrl, shortCode, originalUrl]
+      properties:
+        shortUrl: { type: string }
+        shortCode: { type: string }
+        originalUrl: { type: string }
+    ResolvedUrl:
+      type: object
+      required: [originalUrl]
+      properties:
+        originalUrl: { type: string }
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+

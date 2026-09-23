@@ -1,0 +1,12 @@
+# Workspace tooling is not part of the standalone application.
+.cache/
+
+# Local secrets are never uploaded.
+.env
+.env.*
+
+# Local dependencies and build output are recreated during installation/build.
+node_modules/
+**/node_modules/
+**/dist/
+**/.tsbuildinfo
