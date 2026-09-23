@@ -1,8 +1,8 @@
 import express, { type Express } from "express";
-import pinoHttp from "pino-http";
-import router from "./routes";
-import { redirectRouter } from "./routes/urls";
-import { logger } from "./lib/logger";
+import { pinoHttp } from "pino-http";
+import router from "./routes/index.js";
+import { redirectRouter } from "./routes/urls.js";
+import { logger } from "./lib/logger.js";
 
 const app: Express = express();
 // Trust the single reverse-proxy hop in front of this server when reading client IPs.
